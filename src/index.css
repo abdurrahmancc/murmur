@@ -1,0 +1,19 @@
+.editor-input {
+  min-height: 50px;
+  outline: none;
+  font-size: 16px;
+  padding: 8px;
+  color: #fff;
+  /* background-color: #1e1e1e;
+  border-radius: 8px; */
+}
+
+.editor-placeholder {
+  position: absolute;
+  pointer-events: none;
+  color: #888;
+}
+
+.editor-paragraph {
+  margin: 0 0 10px 0;
+}

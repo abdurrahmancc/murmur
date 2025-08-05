@@ -1,0 +1,40 @@
+# Ignore root level node_modules (if any)
+node_modules/
+
+# Server side node_modules and dist
+/server/node_modules/
+/server/dist/
+/server/.env
+
+# Frontend (React) node_modules and build (optional)
+/src/node_modules/
+/src/.env
+/src/dist/
+/src/.next/
+/src/out/
+
+# DB related (if any generated files exist)
+# You can ignore volume-related files if Docker generates any
+/db/*.log
+/db/*.pid
+/db/data/
+
+# IDE & OS Specific
+.DS_Store
+Thumbs.db
+*.log
+*.swp
+*.swo
+
+# Environment and dependency files
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Optional: compiled output
+*.tsbuildinfo
+
+# Optional: coverage reports
+coverage/
