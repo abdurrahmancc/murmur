@@ -16,7 +16,7 @@ export class UserService {
     private jwtService: JwtService,
   ) {}
 
-  async register(dto: RegisterUserDto): Promise<User> {
+  async register(dto: RegisterUserDto): Promise<object> {
     const username = dto.email.split('@')[0];
     const newUser = this.userRepo.create({
       firstName: dto.firstName,
@@ -26,7 +26,14 @@ export class UserService {
       username: username,
     });
 
-    return await this.userRepo.save(newUser);
+     await this.userRepo.save(newUser);
+
+     const payload = { uid: newUser.id, email: newUser.email, username: newUser.username };
+    const accessToken = this.jwtService.sign(payload);
+
+    return {
+      token: accessToken,
+    };
   }
 
   async login(dto: LoginUserDto) {
@@ -40,7 +47,7 @@ export class UserService {
     const accessToken = this.jwtService.sign(payload);
 
     return {
-      access_token: accessToken,
+      token: accessToken,
     };
   }
 }
