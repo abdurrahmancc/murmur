@@ -1,11 +1,13 @@
 import React from 'react';
+import { Outlet } from 'react-router-dom';
+import RightSidebar from '../components/RightSidebar';
+import Profile from '../components/profile/Profile';
 
 const MyProfile = () => {
     return (
-        <div>
-            <button className='btn btn-primary'>btn</button>
-            <h2>MurmurDetail</h2>
-        </div>
+        <>
+            <Profile />
+        </>
     );
 };
 

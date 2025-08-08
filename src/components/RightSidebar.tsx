@@ -10,9 +10,10 @@ export default function RightSidebar() {
   const { data, isLoading, isError, error, refetch } = useQuery("getAllUsers", async () => await axiosPrivet.get("/api/users/suggestions"));
   console.log("data", data?.data)
 
-  const handleFollow= async (id)=>{
+  const handleFollow = async (id) => {
     try {
-      const {data} = await axiosPrivet.post(`/api/users/follow/${id}`)
+      await axiosPrivet.post(`/api/follow/${id}`)
+      refetch()
     } catch (error) {
       console.log("error", error.message)
     }
@@ -57,16 +58,16 @@ export default function RightSidebar() {
                   </div>
                 </div>
                 <div>
-                  <button className="btn text-black bg-white rounded-full" onClick={()=>handleFollow(user.id)}>Follow</button>
+                  <button className="btn text-black bg-white rounded-full" onClick={() => handleFollow(user.id)}>Follow</button>
                 </div>
               </div>)
             }
           </div>
         </div>
       </div>
-            {
-              isLoading && <Loading/>
-            }
+      {
+        isLoading && <Loading />
+      }
     </>
 
   );

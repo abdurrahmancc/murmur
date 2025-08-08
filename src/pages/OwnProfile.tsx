@@ -3,7 +3,7 @@ import React from 'react';
 const OwnProfile = () => {
     return (
         <div>
-            <h2>OwnProfile</h2>
+            <div className='flex justify-center items-center h-screen text-[20px] font-semibold'>Comming soon</div>
         </div>
     );
 };

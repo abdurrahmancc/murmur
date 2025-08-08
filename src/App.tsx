@@ -10,6 +10,12 @@ import { ToastContainer } from 'react-toastify'
 import Login from './pages/Login'
 import Register from './pages/Register'
 import RequireAuth from './components/auth/RequireAuth'
+import Explore from './pages/Explore'
+import Notifications from './pages/Notifications'
+import Messages from './pages/Messages'
+import Bookmarks from './pages/Bookmarks'
+import Communities from './pages/Communities'
+
 
 function App() {
   return (
@@ -24,6 +30,11 @@ function App() {
             <Route path="murmur/:id" element={<MurmurDetail />} />
             <Route path="me" element={<MyProfile />} />
             <Route path="user/:id" element={<UserProfile />} />
+            <Route path="explore" element={<Explore />} />
+            <Route path="notifications" element={<Notifications />} />
+            <Route path="messages" element={<Messages />} />
+            <Route path="bookmarks" element={<Bookmarks />} />
+            <Route path="communities" element={<Communities />} />
           </Route>
         </Route>
       </Routes>

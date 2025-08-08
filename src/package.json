@@ -10,8 +10,11 @@
     "test": "jest"
   },
   "dependencies": {
+    "@lexical/html": "^0.34.0",
     "@lexical/react": "^0.33.1",
     "axios": "^1.6.0",
+    "date-fns": "^4.1.0",
+    "dayjs": "^1.11.13",
     "js-cookie": "^3.0.5",
     "lexical": "^0.33.1",
     "react": "^19.0.0",
@@ -21,6 +24,7 @@
     "react-query": "^3.39.3",
     "react-router-dom": "^6.20.0",
     "react-toastify": "^11.0.5",
+    "timeago.js": "^4.0.2",
     "uuid": "^11.1.0"
   },
   "devDependencies": {

@@ -69,3 +69,19 @@
                 -1.8em -1.8em 0 0em #ffffff96;
   }
 }
+
+
+.hashtag {
+  color: #1D9BF0;
+  font-weight: bold;
+}
+
+
+.scrollbar-hide {
+      scrollbar-width: none;         
+      -ms-overflow-style: none;     
+    }
+
+    .scrollbar-hide::-webkit-scrollbar {
+      display: none;                
+    }

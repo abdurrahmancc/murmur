@@ -13,8 +13,8 @@ const RequireAuth = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        const { data } = await axiosPrivet.get("/api/auth/me");
-        setUser(data);
+        const { data } = await axiosPrivet.get("/api/user/me");
+        setUser(data?.data);
       } catch (error) {
         console.error("User fetch failed", error.message);
       } finally {
