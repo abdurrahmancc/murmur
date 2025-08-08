@@ -12,7 +12,7 @@ import { Follow } from '../follow/followo';
 
 @Entity('users')
 export class User {
-  @PrimaryGeneratedColumn('uuid')
+@PrimaryGeneratedColumn("uuid", { name: "Id" })
   id: string;
 
   @Column({ name: 'Username', length: 50, unique: true })
@@ -45,7 +45,7 @@ export class User {
   @UpdateDateColumn({ name: 'UpdatedAt', type: 'datetime' })
   updatedAt: Date;
 
-  // Relations
+
   @OneToMany(() => Murmur, (murmur) => murmur.user)
   murmurs: Murmur[];
 

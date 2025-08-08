@@ -8,7 +8,7 @@ import { FaUserCircle } from 'react-icons/fa';
 const Timeline = () => {
     return (
         <>
-            <div className="drawer lg:drawer-open drawer-end container mx-auto">
+            <div className="drawer lg:drawer-open drawer-end container mx-auto gap-[30px]">
                 <input id="my-drawer-2" type="checkbox" className="drawer-toggle" />
                 <div className="drawer-content flex flex-col  border-r-[0.5px] border-gray-700 ">
                     <div className='grid grid-cols-2 border-b border-gray-700 text-center'>

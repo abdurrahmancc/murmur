@@ -27,7 +27,8 @@ const Login = () => {
         const password = data.password;
         try {
             setIsLogin(true);
-            const { data: result } = await axiosPrivet.post("/user/login", { email, password });
+            const { data: result } = await axiosPrivet.post("/api/auth/login", { email, password });
+            console.log("result", result)
             Cookies.set(accessToken, result.token);
             navigate(from, { replace: true });
             

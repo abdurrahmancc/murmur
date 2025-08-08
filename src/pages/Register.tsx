@@ -22,7 +22,7 @@ const Register = () => {
     const onSubmit = async (data) => {
         try {
             setIsRegister(true);
-            const response = await axiosPrivet.post(`/user/register`, data);
+            const response = await axiosPrivet.post(`/api/auth/register`, data);
             if (response.status == 201 && response?.data?.token) {
                 Cookies.set(accessToken, response.data.token);
                 navigator(from, { replace: true });

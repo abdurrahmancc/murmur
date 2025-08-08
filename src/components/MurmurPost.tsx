@@ -9,44 +9,79 @@ import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
 import ToolbarPlugin from './ToolbarPlugin'
 import { MdPublic } from 'react-icons/md'
 import { FaCheck, FaUserCheck } from 'react-icons/fa'
+import { CiImageOn } from 'react-icons/ci'
+import Cookies from "js-cookie";
+import { accessToken } from '../hooks/useCookies'
+import axiosPrivet from '../hooks/axiosPrivet'
 
-const editorConfig = {
+const initialConfig = {
     namespace: 'MurmurEditor',
-    theme: {
-        paragraph: 'editor-paragraph',
-    },
-    onError(error: any) {
-        throw error
-    },
-}
+    onError: (error: any) => { console.error('Lexical error:', error); },
+    theme: {},
+    editorState: null,
+    nodes: [],
+};
 
 const postAccessList = [
-    { id: 1, title: "Everyone", icon: MdPublic },
-    { id: 2, title: "Accounts you follow", icon: FaUserCheck },
+    { id: 1, title: "Everyone", value: "Public", icon: MdPublic },
+    { id: 2, title: "Accounts you follow", value: "Followers", icon: FaUserCheck },
 ];
 
 
 const MurmurPost: React.FC = () => {
+    const [postContent, setPostContent] = useState<string>('');
     const [selectedAccessId, setSelectedAccessId] = useState<number>(1);
+    const [selectedImages, setSelectedImages] = useState<File[]>([]);
+
     const selectedAccess = postAccessList.find(acc => acc.id === selectedAccessId);
     const SelectedIcon = selectedAccess?.icon;
 
     const onChange = (editorState: EditorState) => {
-        editorState.read(() => {
-            const textContent = editorState.toJSON()
-            console.log('Editor content:', textContent)
-        })
-    }
+        editorState.read(() => setPostContent(JSON.stringify(editorState.toJSON())));
+    };
+
+    const handleImagesChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) setSelectedImages(Array.from(e.target.files));
+    };
+
+const handleSubmit = async () => {
+  const access = postAccessList.find(a => a.id === selectedAccessId)?.value || 'Public';
+
+  const data = {
+    content: postContent,
+    access,
+  };
+
+  try {
+    const res = await axiosPrivet.post('http://localhost:3000/api/murmurs', data);
+    console.log('Success', res);
+  } catch (err) {
+    console.error('Error:', err);
+  }
+};
+
 
     return (
         <div className=" relative w-full">
-            <LexicalComposer initialConfig={editorConfig}>
+            <LexicalComposer initialConfig={initialConfig}>
 
                 <RichTextPlugin
                     contentEditable={<ContentEditable className="editor-input w-full" />}
                     placeholder={<div className="editor-placeholder left-[10px] top-[8px]">What's happening?</div>}
-                    ErrorBoundary={LexicalErrorBoundary}
+                    // ErrorBoundary={LexicalErrorBoundary}
+                    ErrorBoundary={({ children }) => <>{children}</>}
                 />
+                {/* <div className="grid grid-cols-2 md:grid-cols-3 gap-2 mt-4">
+                    {selectedImages.map((image, index) => (
+                        <div key={index} className="overflow-hidden rounded-lg">
+                            <img
+                                src={URL.createObjectURL(image)}
+                                alt={`img-${index}`}
+                                className="w-full h-auto object-cover"
+                            />
+                        </div>
+                    ))}
+                </div> */}
 
                 <div className="dropdown">
                     <div tabIndex={0} role="button"
@@ -83,8 +118,15 @@ const MurmurPost: React.FC = () => {
                 </div>
 
                 <div className='flex justify-between items-center border-t-[0.5px] border-gray-700 p-2 mt-2'>
-                    <ToolbarPlugin />
-                    <button type='submit' className='bg-white btn rounded-full px-6 text-black'>Post</button>
+                    <div>
+                        {/* <ToolbarPlugin /> */}
+                        {/* <label htmlFor='uploadImage' className='cursor-pointer'>
+                        <input id='uploadImage' hidden type="file" accept="image/*" multiple onChange={handleImagesChange} />
+                        <CiImageOn className='text-[22px] text-blue-500' />
+                        </label> */}
+                    </div>
+
+                    <button type='submit' onClick={handleSubmit} className='bg-white btn rounded-full px-6 text-black'>Post</button>
                 </div>
                 <HistoryPlugin />
                 <OnChangePlugin onChange={onChange} />
