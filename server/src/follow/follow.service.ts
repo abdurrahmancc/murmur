@@ -63,7 +63,6 @@ export class FollowService {
         return { message: "Unfollowed successfully." };
     }
 
-
     async getFollowers(userId: string): Promise<User[]> {
         const user = await this.userRepo.findOne({ where: [{ id: userId }, { username: userId }] });
         const followers = await this.followRepo.find({ where: [{ following: { id: user?.id } }], relations: ['follower'] });
