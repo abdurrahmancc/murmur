@@ -9,6 +9,7 @@ import { Murmur } from './entities/murmur/murmur';
 import { Like } from './entities/like/like';
 import { Follow } from './entities/follow/followo';
 import { MurmursModule } from './murmurs/murmurs.module';
+import { FollowModule } from './follow/follow.module';
 
 
 @Module({
@@ -27,6 +28,7 @@ import { MurmursModule } from './murmurs/murmurs.module';
     UsersModule,
     LikeModule,
     MurmursModule,
+    FollowModule,
   ],
   controllers: [AppController],
   providers: [AppService],

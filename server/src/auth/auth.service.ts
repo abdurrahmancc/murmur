@@ -27,7 +27,7 @@ export class AuthService {
     
          await this.userRepo.save(newUser);
     
-         const payload = { uid: newUser.id, email: newUser.email, username: newUser.username };
+         const payload = { uid: newUser.id, email: newUser.email, username: newUser.username, firstName: newUser.firstName, lastName: newUser.lastName };
         const accessToken = this.jwtService.sign(payload);
     
         return {
@@ -42,7 +42,7 @@ export class AuthService {
           throw new BadRequestException('Invalid credentials');
         }
     
-        const payload = { uid: user.id, email: user.email, username: user.username };
+        const payload = { uid: user.id, email: user.email, username: user.username , firstName: user.firstName, lastName: user.lastName};
         const accessToken = this.jwtService.sign(payload);
     
         return {

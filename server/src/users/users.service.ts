@@ -6,6 +6,8 @@ import { In, Not, Repository } from 'typeorm';
 import { User } from '../entities/user/user';
 import { JwtService } from '@nestjs/jwt';
 import { Follow } from 'src/entities/follow/followo';
+import cloudinary from 'src/cloudinary/cloudinary.config';
+import { ImageService } from 'src/common/services/image.service';
 
 
 @Injectable()
@@ -17,8 +19,9 @@ export class UsersService {
 
     @InjectRepository(Follow)
     private followRepo: Repository<Follow>,
-  ) { }
 
+    private readonly imageService: ImageService,
+  ) { }
 
 
   async getSuggestedUsers(currentUserId: string): Promise<User[]> {
@@ -40,51 +43,75 @@ export class UsersService {
     return suggestions;
   }
 
-  async followUser(currentUserId: string, targetUserId: string): Promise<{ message: string, success: boolean }> {
-    if (currentUserId === targetUserId) {
-      throw new BadRequestException("You cannot follow yourself.");
-    }
+  async getLoginUser(userId: string): Promise<User> {
 
-    const existingFollow = await this.followRepo.findOne({
-      where: {
-        follower: { id: currentUserId },
-        following: { id: targetUserId },
-      },
+    const user = await this.userRepo.findOne({
+      where: { id: userId },
+      select: ['id', 'firstName', 'lastName', 'username', 'avatarUrl', 'coverPhotoUrl', 'bio', 'phoneNumber', 'createdAt', 'updatedAt'],
     });
 
-    if (existingFollow) {
-      throw new BadRequestException("You are already following this user.");
-    }
-
-    const follower = await this.userRepo.findOneBy({ id: currentUserId });
-    const following = await this.userRepo.findOneBy({ id: targetUserId });
-
-    if (!follower || !following) {
-      throw new NotFoundException("User not found.");
-    }
-
-    const follow = this.followRepo.create({ follower, following });
-    await this.followRepo.save(follow);
-
-    return { success: true, message: `You are now following ${following.username}` };
+    return user;
   }
 
-  async unfollowUser(currentUserId: string, targetUserId: string): Promise<{ message: string }> {
-    const follow = await this.followRepo.findOne({
-      where: {
-        follower: { id: currentUserId },
-        following: { id: targetUserId },
-      },
+    async getUserByUsername(username: string): Promise<User> {
+
+    const user = await this.userRepo.findOne({
+      where: { username: username },
+      select: ['id', 'firstName', 'lastName', 'username', 'avatarUrl', 'coverPhotoUrl', 'bio', 'phoneNumber', 'createdAt', 'updatedAt'],
     });
 
-    if (!follow) {
-      throw new BadRequestException("You are not following this user.");
+    return user;
+  }
+
+  //relations = ["following", "followers", "murmurs", "likes"]
+  async getLoginUserDetails( userId: string, relations: string[] = []): Promise<Omit<User, 'password'> | null> {
+    const user = await this.userRepo.findOne({ where: { id: userId }, relations });
+    if (!user) return null;
+
+    const { password, ...userWithoutPassword } = user;
+    return userWithoutPassword;
+  }
+
+
+
+
+  async updateProfile( id: string, data: any,avatarFile?: Express.Multer.File, coverFile?: Express.Multer.File): Promise<User> {
+    const user = await this.userRepo.findOne({ where: { id } });
+    if (!user) throw new NotFoundException('User not found');
+
+    if (avatarFile) {
+      if (user.avatarUrl) {
+        await this.imageService.deleteImage(user.avatarUrl);
+      }
+      try {
+        const avatarUrl = await this.imageService.uploadImage(avatarFile);
+        user.avatarUrl = avatarUrl;
+      } catch (error) {
+        throw new BadRequestException('Avatar upload failed: ' + error.message);
+      }
     }
 
-    await this.followRepo.remove(follow);
+    if (coverFile) {
+      if (user.coverPhotoUrl) {
+        await this.imageService.deleteImage(user.coverPhotoUrl);
+      }
+      try {
+        const coverUrl = await this.imageService.uploadImage(coverFile);
+        user.coverPhotoUrl = coverUrl;
+      } catch (error) {
+        throw new BadRequestException('Cover photo upload failed: ' + error.message);
+      }
+    }
 
-    return { message: "Unfollowed successfully." };
+    // Update only provided text fields
+    if (data.firstName !== undefined) user.firstName = data.firstName;
+    if (data.lastName !== undefined) user.lastName = data.lastName;
+    if (data.bio !== undefined) user.bio = data.bio;
+
+    return await this.userRepo.save(user);
   }
+
+
 
 }
 

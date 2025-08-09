@@ -7,7 +7,7 @@ import {
 import { User } from '../user/user';
 
 
-@Entity()
+@Entity('follows')
 export class Follow {
   @PrimaryGeneratedColumn()
   id: number;

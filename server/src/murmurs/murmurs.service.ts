@@ -55,6 +55,28 @@ export class MurmursService {
   }
 
 
+  async getMyMurmurs(page: number = 1, pageSize: number = 10, userId: string) {
+    const [items, totalItems] = await this.murmursRepo.findAndCount({
+      where: { user: { id: userId } },
+      relations: ['user', 'likes', 'replies'],
+      order: { createdAt: 'DESC' },
+      skip: (page - 1) * pageSize,
+      take: pageSize,
+    });
+
+    const totalPages = Math.ceil(totalItems / pageSize);
+    const maxPagesToShow = 5;
+    let startPage = Math.max(1, page - Math.floor(maxPagesToShow / 2));
+    let endPage = Math.min(startPage + maxPagesToShow - 1, totalPages);
+
+    if (endPage - startPage < maxPagesToShow - 1) {
+      startPage = Math.max(1, endPage - maxPagesToShow + 1);
+    }
+
+    return { items, totalItems, pageNumber: page, pageSize, totalPages, startPage, endPage };
+  }
+
+
   async likeMurmur(dto): Promise<Like> {
     try {
       const { userId, murmurId } = dto;
@@ -111,13 +133,13 @@ export class MurmursService {
   }
 
 
-async deleteMurmur(murmurId: number, userId: string): Promise<boolean> {
-  const murmur = await this.murmursRepo.findOne({ where: { id: murmurId, user: { id: userId } } });
-  if (!murmur) return false;
+  async deleteMurmur(murmurId: number, userId: string): Promise<boolean> {
+    const murmur = await this.murmursRepo.findOne({ where: { id: murmurId, user: { id: userId } } });
+    if (!murmur) return false;
 
-  await this.murmursRepo.delete(murmurId);
-  return true;
-}
+    await this.murmursRepo.delete(murmurId);
+    return true;
+  }
 
 
 }

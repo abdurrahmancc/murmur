@@ -12,7 +12,7 @@ export class MurmursController {
   @UseGuards(JwtAuthGuard)
   @Post('/murmur/create')
   async createMurmur(@Body() dto: CreateMurmurDto, @Req() req) {
-    const userId = req?.user?.userId;
+    const userId = req?.user?.uid;
     try {
       const created = await this.murmursService.createMurmur(userId, dto);
       return ApiResponse.SuccessResponse(created, 201, 'Murmur created successfully');
@@ -21,15 +21,26 @@ export class MurmursController {
     }
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get('/murmurs')
-  async getAllMurmurs( @Query('page') page: string = '1',  @Query('pageSize') pageSize: string = '10',) {
+  async getAllMurmurs(@Query('page') page: string = '1', @Query('pageSize') pageSize: string = '10',) {
     try {
       const pageNumber = parseInt(page, 10) || 1;
       const size = parseInt(pageSize, 10) || 10;
-
-
       const murmurs = await this.murmursService.getMurmurs(pageNumber, size);
+      return ApiResponse.SuccessResponse(murmurs, 200, 'Murmurs fetched successfully');
+    } catch (error) {
+      return ApiResponse.ErrorResponse(['Failed to fetch murmurs'], 500, error.message);
+    }
+  }
 
+  @UseGuards(JwtAuthGuard)
+  @Get('/get-murmurs-by-id/:userId')
+  async getMyMurmurs(@Query('page') page: string = '1', @Query('pageSize') pageSize: string = '10', @Param('userId') userId: string) {
+    try {
+      const pageNumber = parseInt(page, 10) || 1;
+      const size = parseInt(pageSize, 10) || 10;
+      const murmurs = await this.murmursService.getMyMurmurs(pageNumber, size, userId);
       return ApiResponse.SuccessResponse(murmurs, 200, 'Murmurs fetched successfully');
     } catch (error) {
       return ApiResponse.ErrorResponse(['Failed to fetch murmurs'], 500, error.message);
@@ -42,7 +53,7 @@ export class MurmursController {
   async likeMurmur(@Param('murmurId') murmurId: number, @Req() req) {
     const userId = req.user?.uid;
     try {
-      const like = await this.murmursService.likeMurmur({userId, murmurId});
+      const like = await this.murmursService.likeMurmur({ userId, murmurId });
       return ApiResponse.SuccessResponse(like, 200, 'Murmur liked successfully');
     } catch (error) {
       return ApiResponse.ErrorResponse(['Failed to like murmur'], 400, error.message);
@@ -53,9 +64,9 @@ export class MurmursController {
   @UseGuards(JwtAuthGuard)
   @Delete('/murmur/unlike/:murmurId')
   async unlikeMurmur(@Param('murmurId') murmurId: number, @Req() req) {
-    const userId = req.user?.userId;
+    const userId = req.user?.uid;
     try {
-      const result = await this.murmursService.unlikeMurmur({userId, murmurId});
+      const result = await this.murmursService.unlikeMurmur({ userId, murmurId });
       return ApiResponse.SuccessResponse(result, 200, 'Murmur unliked successfully');
     } catch (error) {
       return ApiResponse.ErrorResponse(['Failed to unlike murmur'], 400, error.message);

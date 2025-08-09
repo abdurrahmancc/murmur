@@ -33,6 +33,9 @@ export class User {
   @Column({ name: 'AvatarUrl', type: 'text', nullable: true })
   avatarUrl: string;
 
+  @Column({ name: 'CoverPhotoUrl', type: 'text', nullable: true })
+  coverPhotoUrl: string;
+
   @Column({ name: 'Bio', type: 'text', nullable: true })
   bio: string;
 
