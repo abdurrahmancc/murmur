@@ -1,73 +1,55 @@
 import React, { useEffect, useState } from 'react'
 import { FaHeart, FaRegComment, FaUserCircle } from 'react-icons/fa';
 import dayjs from 'dayjs';
-import relativeTime from 'dayjs/plugin/relativeTime';
-import updateLocale from 'dayjs/plugin/updateLocale';
-import localizedFormat from 'dayjs/plugin/localizedFormat';
 import { IoStatsChart } from 'react-icons/io5';
 import { GoHeart } from 'react-icons/go';
 import axiosPrivet from '../../hooks/axiosPrivet';
 import { TfiMoreAlt } from 'react-icons/tfi';
 import utc from 'dayjs/plugin/utc';
 import timezone from 'dayjs/plugin/timezone';
-import { format, render, cancel, register } from 'timeago.js';
+import { format, register } from 'timeago.js';
+import { NavLink, useParams } from 'react-router-dom';
 
 
 dayjs.extend(utc);
 dayjs.extend(timezone);
 
 const localeFunc = (number: number, index: number, totalSec?: number): [string, string] => {
-  const phrases: [string, string][] = [
-    ['just now', 'right now'],
-    ['%s s', 'in %s seconds'],
-    ['1 m', 'in 1 minute'],
-    ['%s m', 'in %s minutes'],
-    ['1 h', 'in 1 hour'],
-    ['%s h', 'in %s hours'],
-    ['1 d', 'in 1 day'],
-    ['%s d', 'in %s days'],
-    ['1 w', 'in 1 week'],
-    ['%s w', 'in %s weeks'],
-    ['1 m', 'in 1 month'],
-    ['%s m', 'in %s months'],
-    ['1 y', 'in 1 year'],
-    ['%s y', 'in %s years']
-  ];
+    const phrases: [string, string][] = [
+        ['just now', 'right now'],
+        ['%s s', 'in %s seconds'],
+        ['1 m', 'in 1 minute'],
+        ['%s m', 'in %s minutes'],
+        ['1 h', 'in 1 hour'],
+        ['%s h', 'in %s hours'],
+        ['1 d', 'in 1 day'],
+        ['%s d', 'in %s days'],
+        ['1 w', 'in 1 week'],
+        ['%s w', 'in %s weeks'],
+        ['1 m', 'in 1 month'],
+        ['%s m', 'in %s months'],
+        ['1 y', 'in 1 year'],
+        ['%s y', 'in %s years']
+    ];
 
-  return phrases[index];
+    return phrases[index];
 };
 
 register('custom', localeFunc);
 
 
 
-const MurmurFeedItem = ({ murmur, refetch, loginUser, followingData, followersData, followersRefetch, followingRefetch }) => {
+const MurmurFeedItem = ({ murmur, refetch, loginUser, followingData, followingRefetch }) => {
+    const {username} = useParams()
     const [isLiked, setIsLiked] = useState(false);
     const [likesCount, setLikesCount] = useState(0);
     const parsedJson = JSON.parse(murmur?.text);
     const [isFollow, setIsFollow] = useState(false);
 
-const formattedTime = (utcDateString: string) => {
-  const date = new Date(utcDateString); 
-  return format(date, 'custom');
-}
-
-const formatShortTime = (utcDateString) => {
-
-  const userTimeZone = dayjs.tz.guess();
-
-  const inputDate = dayjs.utc(utcDateString).tz(userTimeZone);
-  const now = dayjs().tz(userTimeZone);
-
-  const diffInMinutes = now.diff(inputDate, 'minute');
-  const diffInHours = now.diff(inputDate, 'hour');
-
-  if (diffInMinutes < 1) return 'just now';
-  if (diffInMinutes < 60) return `${diffInMinutes}m`;
-  if (diffInHours < 24) return `${diffInHours}h`;
-
-  return inputDate.format('MMM D');
-};
+    const formattedTime = (utcDateString: string) => {
+        const date = new Date(utcDateString);
+        return format(date, 'custom');
+    }
 
 
     function highlightHashtagsAndMentions(text) {
@@ -161,11 +143,17 @@ const formatShortTime = (utcDateString) => {
     return (
         <div className="p-4 border-b-[0.5px] border-gray-700">
             <div className='flex gap-2 w-full'>
-                <FaUserCircle className='w-[40px] h-[40px]' />
+                <div className='w-[40px] rounded-full h-[40px]'>
+                    <NavLink to={username ?  `/${username}` : murmur?.user?.username}>
+                        {
+                            murmur?.user?.avatarUrl ? <img src={murmur?.user?.avatarUrl} alt={murmur?.user?.lastName} className="w-full min-w-[40px]  rounded-full h-full object-cover" /> : <FaUserCircle className='w-[40px] rounded-full h-[40px]' />
+                        }
+                    </NavLink>
+                </div>
                 <div className='w-full'>
                     <div className='flex justify-between'>
                         <div className='flex gap-[10px]'>
-                            <h5 className="font-bold text-[#E7E9EA]"> {murmur?.user?.firstName} {murmur?.user?.lastName}</h5>
+                            <NavLink to={username ? `/${username}` : murmur?.user?.username} className="font-bold text-[#E7E9EA]"> {murmur?.user?.firstName} {murmur?.user?.lastName}</NavLink>
                             <span className='text-[#71767B]'>@{murmur?.user?.username} •</span><span className='text-[#71767B]'>{formattedTime(murmur.createdAt)}</span>
                         </div>
                         <div>
@@ -178,11 +166,9 @@ const formatShortTime = (utcDateString) => {
                                                 <button onClick={() => handleDeleteMurmur(murmur.id)}>Remove</button>
                                             </li>
                                         )}
-
                                         <li>
                                             <button>Share</button>
                                         </li>
-
                                         {loginUser?.id !== murmur?.user?.id && (
                                             <>
                                                 <li>
@@ -239,7 +225,6 @@ const formatShortTime = (utcDateString) => {
                     </div>
                 </div>
             </div>
-
         </div>
     );
 };

@@ -15,6 +15,10 @@ import Notifications from './pages/Notifications'
 import Messages from './pages/Messages'
 import Bookmarks from './pages/Bookmarks'
 import Communities from './pages/Communities'
+import Following from './pages/Following'
+import VerifiedFollowers from './pages/VerifiedFollowers'
+import Followers from './pages/Followers'
+import NotFound from './pages/NotFound'
 
 
 function App() {
@@ -28,13 +32,21 @@ function App() {
           <Route path="/" element={<Layout />}>
             <Route index element={<Timeline />} />
             <Route path="murmur/:id" element={<MurmurDetail />} />
-            <Route path="me" element={<MyProfile />} />
+            <Route path=":username" element={<MyProfile />}>
+              <Route path="followers" element={<Followers />} />
+              <Route path="verified_followers" element={<VerifiedFollowers />} />
+              <Route path="following" element={<Following />} />
+            </Route>
             <Route path="user/:id" element={<UserProfile />} />
             <Route path="explore" element={<Explore />} />
             <Route path="notifications" element={<Notifications />} />
             <Route path="messages" element={<Messages />} />
             <Route path="bookmarks" element={<Bookmarks />} />
             <Route path="communities" element={<Communities />} />
+            {/* <Route path="followers" element={<Followers />} />
+            <Route path="verified_followers" element={<VerifiedFollowers />} />
+            <Route path="following" element={<Following />} /> */}
+            <Route path="*" element={<NotFound />} />
           </Route>
         </Route>
       </Routes>

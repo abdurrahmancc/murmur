@@ -116,9 +116,7 @@ const MyMurmurs = () => {
                         refetch={refetch}
                         loginUser={user}
                         followingData={followingData?.data?.data}
-                        followersData={followersData?.data?.data}
                         followingRefetch={followingRefetch}
-                        followersRefetch={followersRefetch}
                     />
                 ))}
             <Pagination

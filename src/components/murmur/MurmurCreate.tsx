@@ -19,7 +19,8 @@ const postAccessList = [
     { id: 2, title: "Accounts you follow", value: "Followers", icon: FaUserCheck },
 ];
 
-const MurmurCreate: React.FC = () => {
+
+const MurmurCreate: React.FC<any> = ({ onCreate }) => {
     const [postContent, setPostContent] = useState<string>('');
     const [selectedAccessId, setSelectedAccessId] = useState<number>(1);
     const editorRef = useRef<any>(null);
@@ -36,11 +37,13 @@ const MurmurCreate: React.FC = () => {
         const data = { content: postContent, access };
 
         try {
-            const res = await axiosPrivet.post('http://localhost:3000/api/murmur/create', data);
+            await axiosPrivet.post('http://localhost:3000/api/murmur/create', data);
+            onCreate(true);
+            console.log("onCreate(true);")
             if (editorRef.current) {
                 editorRef.current.update(() => {
                     const root = $getRoot();
-                    root.clear();
+                    root.clear();              
                 });
             }
         } catch (err) {

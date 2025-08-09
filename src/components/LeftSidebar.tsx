@@ -1,12 +1,9 @@
 // src/components/LeftSidebar.tsx
 
 import { useEffect, useState } from 'react';
-import { CiUser } from 'react-icons/ci';
 import { FaUserCircle } from 'react-icons/fa';
-import { MdHome } from 'react-icons/md';
-import { Link, NavLink, useNavigate } from 'react-router-dom';
+import { NavLink, useNavigate } from 'react-router-dom';
 import axiosPrivet from '../hooks/axiosPrivet';
-import { useQuery } from 'react-query';
 import { accessToken, removeCookie } from '../hooks/useCookies';
 import { LoginUserType } from '../types/user';
 import { leftSideRoute } from '../routes/Routes';
@@ -21,7 +18,7 @@ export default function LeftSidebar() {
         const fetchUser = async () => {
             try {
                 setLoading(true);
-                const { data } = await axiosPrivet.get("/api/user/me");
+                const { data } = await axiosPrivet.get(`/api/user/me`);
                 setUser(data?.data);
             } catch (error) {
                 console.error("User fetch failed", error.message);
@@ -43,22 +40,27 @@ export default function LeftSidebar() {
         <nav className="menu justify-between text-base-content min-h-full w-full">
             <div className='flex flex-col gap-[14px]'>
                 {
-                    leftSideRoute.map((route, index) => <li key={index} >
-                        <NavLink to={route.path} className={({ isActive }) => `block text-white max-w-fit rounded-full text-[20px] pr-[20px] py-[10px] flex items-center ${isActive ? 'font-bold' : ''}`}>
-                            <route.icon className="text-[26px]" />
-                            <span className="px-[5px] inline-block">{route.name}</span>
-                        </NavLink>
-                    </li>)
+                    leftSideRoute.map((route, index) => {
+                        const routePath = route.path === "me" ? user?.username ?? "" : route.path;
+                        return <li key={index} >
+                            <NavLink to={routePath} className={({ isActive }) => `block text-white max-w-fit rounded-full text-[20px] pr-[20px] py-[10px] flex items-center ${isActive ? 'font-bold' : ''}`}>
+                                <route.icon className="text-[26px]" />
+                                <span className="px-[5px] inline-block">{route.name}</span>
+                            </NavLink>
+                        </li>
+                    })
                 }
                 <li>
                     <button className='btn bg-white text-black py-[25px] text-[17px] rounded-full w-full'>Post</button>
                 </li>
             </div>
             <li>
-                <div className="dropdown dropdown-top dropdown-center rounded-full">
+                <div className="dropdown dropdown-top dropdown-center mt-5 rounded-full">
                     <div tabIndex={0} role="button" className="">
-                        <button className='block w-full text-white  text-[20px] pr-[20px] flex gap-[10px] items-center cursor-pointer'>
-                            <FaUserCircle className='w-[40px] h-[40px]' />
+                        <button className='block w-full text-white  text-[20px] py-[5px] pr-[20px] flex gap-[10px] items-center cursor-pointer'>
+                            {
+                                user?.avatarUrl ? <img src={user?.avatarUrl} alt={user?.firstName} className="w-full w-[40px] h-[40px] max-w-[40px] min-h-[40px] rounded-full h-full object-cover" /> : <FaUserCircle className='w-[40px] rounded-full h-[40px]' />
+                            }
                             <div className='text-start leading-[20px]'>
                                 <h5 className="font-bold text-[15px] text-[#E7E9EA] text-nowrap">{user?.firstName} {user?.lastName}</h5>
                                 <span className='text-[#71767B] text-[15px]'>@{user?.username}</span>
@@ -75,7 +77,6 @@ export default function LeftSidebar() {
                     </ul>
                 </div>
             </li>
-
         </nav>
     );
 }

@@ -6,7 +6,7 @@ import Pagination from '../shared/Pagination';
 import { useSearchParams, useNavigate } from 'react-router-dom';
 import Loading from '../shared/Loading';
 
-const MurmurFeed = ({ api }) => {
+const MurmurFeed = ({ api, murmurRefetch, onRefetched }) => {
     const [loading, setLoading] = useState(false);
     const [searchParams] = useSearchParams();
     const navigate = useNavigate();
@@ -65,18 +65,20 @@ const MurmurFeed = ({ api }) => {
         { keepPreviousData: true }
     );
 
+
+    useEffect(() => {
+        if (murmurRefetch) {
+            refetch().then(() => {
+                if (onRefetched) onRefetched();
+            });
+        }
+    }, [murmurRefetch, refetch, onRefetched]);
+
+
     const { data: followingData, isLoading: isLoadingFollowing, refetch: followingRefetch } = useQuery(
         ['get-following'],
         async () => {
             const response = await axiosPrivet.get('/api/follow/get-following');
-            return response;
-        }
-    );
-
-    const { data: followersData, isLoading: isLoadingfollowers, refetch: followersRefetch } = useQuery(
-        ['get-followers'],
-        async () => {
-            const response = await axiosPrivet.get('/api/follow/get-followers');
             return response;
         }
     );
@@ -103,7 +105,7 @@ const MurmurFeed = ({ api }) => {
         setPageNumber(1);
         updatePagination(1, newRows);
     };
-console.log("data?.data?.data?.items.length", data?.data?.data?.items.length)
+
     return (
         <div>
             {isLoading || loading && <Loading />}
@@ -111,14 +113,12 @@ console.log("data?.data?.data?.items.length", data?.data?.data?.items.length)
                 <>
                     {data?.data?.data?.items.map(murmur => (
                         <MurmurFeedItem
-                            key={murmur.id} // better than index
+                            key={murmur.id}
                             murmur={murmur}
                             refetch={refetch}
                             loginUser={user}
                             followingData={followingData?.data?.data}
-                            followersData={followersData?.data?.data}
                             followingRefetch={followingRefetch}
-                            followersRefetch={followersRefetch}
                         />
                     ))}
 
@@ -134,8 +134,6 @@ console.log("data?.data?.data?.items.length", data?.data?.data?.items.length)
                     />
                 </>
             )}
-
-
         </div>
     );
 };

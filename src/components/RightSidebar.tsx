@@ -3,12 +3,12 @@ import { FaUserCircle } from "react-icons/fa";
 import { useQuery } from "react-query";
 import axiosPrivet from "../hooks/axiosPrivet";
 import Loading from "./shared/Loading";
+import { NavLink } from "react-router-dom";
 
 
 export default function RightSidebar() {
-
   const { data, isLoading, isError, error, refetch } = useQuery("getAllUsers", async () => await axiosPrivet.get("/api/users/suggestions"));
-  console.log("data", data?.data)
+
 
   const handleFollow = async (id) => {
     try {
@@ -18,11 +18,11 @@ export default function RightSidebar() {
       console.log("error", error.message)
     }
   }
-
+ if (isLoading) return <Loading />
 
   return (
     <>
-      <div className="min-h-full w-88">
+      <div className="min-h-full sticky top-0">
         <div className="mt-[10px]">
           <form >
             <label className="relative max-w-[350px] md:block  hidden">
@@ -33,8 +33,6 @@ export default function RightSidebar() {
                 <BiSearchAlt className="text-2xl text-gray-200 text-[18px]" />
               </button>
               <input
-                // value={searchId}
-                // onChange={(e) => setSearchId(e.target.value)}
                 className=" placeholder:text-white block  w-full py-2 pl-8 pr-4 shadow-sm focus:border-blue-400 focus:outline-none border-[0.5px] border-gray-700 rounded-full focus:ring-0 text-[14px]"
                 placeholder="Search"
                 type="text"
@@ -49,11 +47,14 @@ export default function RightSidebar() {
             {
               data?.data?.length > 0 && data?.data.map(user => <div key={user?.id} className="flex justify-between items-center py-[12px] px-[16px]">
                 <div className="flex items-center gap-[6px]">
-                  {
-                    user?.avatarUrl ? <img src={user?.avatarUrl} alt={user.firstName} className="w-[40px] h-[40px] rounded-full" /> : <BiUserCircle className="w-[40px] h-[40px] rounded-full" />
-                  }
+                  <NavLink to={user?.username}>
+                    {
+                      user?.avatarUrl ? <img src={user?.avatarUrl} alt={user.firstName} className="w-[40px] h-[40px] rounded-full" /> : <FaUserCircle className="w-[40px] h-[40px] rounded-full" />
+                    }
+                  </NavLink>
+
                   <div>
-                    <h5 className="text-[15px] font-bold">{user?.firstName} {user?.lastName}</h5>
+                    <NavLink to={user?.username} className="text-[15px] font-bold">{user?.firstName} {user?.lastName}</NavLink>
                     <p className="text-[15px] text-gray-500">@{user?.username}</p>
                   </div>
                 </div>
@@ -65,9 +66,6 @@ export default function RightSidebar() {
           </div>
         </div>
       </div>
-      {
-        isLoading && <Loading />
-      }
     </>
 
   );
